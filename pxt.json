@@ -1,0 +1,17 @@
+{
+    "name": "SmartModule",
+    "version": "1.0.0",
+    "description": "Smart module",
+    "license": "MIT",
+    "dependencies": {
+        "core": "*",
+        "radio": "*"
+    },
+    "files": [
+        "README.md",
+        "SmartModule.ts",
+		"_locales/zh/smartModule-strings.json"
+    ],
+    "public": true,
+    "preferredEditor": "tsprj"
+}
