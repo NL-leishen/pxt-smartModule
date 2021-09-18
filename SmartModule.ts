@@ -93,17 +93,17 @@ enum Mode {
 }
 
 enum times {
-    //% block=year
+    //% block=年
     time1 = 0,
-    //% block=month
+    //% block=月
     time2 = 1,
-    //% block=day
+    //% block=日
     time3 = 2,
-    //% block=hour
+    //% block=时
     time4 = 3,
-    //% block=minute
+    //% block=分
     time5 = 4,
-    //% block=second
+    //% block=秒
     time6 = 5,
 }
 
@@ -346,9 +346,9 @@ namespace SmartModule {
         /**
          * get Year
          */
-        //% blockId=DS1302_get_year block="%ds|get time %TIME" group="DS1302时钟模块"
+        //% blockId=DS1302_get_year block="DS1302时钟模块获取 %TIME" group="DS1302时钟模块"
         //% weight=80 blockGap=8
-      
+        //% subcategory="智能模块"
         export function getYear(TIME: times): number {
             if (btns == 1) {
                 ts = Math.min(HexToDec(getReg(DS1302_REG_SECOND + 1)), 59)
@@ -415,15 +415,16 @@ namespace SmartModule {
          * set year
          * @param dat is the Year will be set, eg: 2018
          */
-        //% blockId=DS1302_set_year block="%ds|set year %dat set month %mon set day %days" group="DS1302时钟模块"
+        //% blockId=DS1302_set_year block="DS1302时钟模块设置 年 %year 月 %mon 日 %days" group="DS1302时钟模块"
         //% weight=81 blockGap=8
         //% mon.min=1 mon.max=12
         //% days.min=1 days.max=31
-        export function setYear(dat: number, mon: number, days: number): void {
-            tys = dat;
+        //% subcategory="智能模块"
+        export function setYear(year: number, mon: number, days: number): void {
+            tys = year;
             tms = mon;
             tds = days;
-            wr(DS1302_REG_YEAR, DecToHex(dat % 100));
+            wr(DS1302_REG_YEAR, DecToHex(year % 100));
             wr(DS1302_REG_MONTH, DecToHex(mon % 13));
             wr(DS1302_REG_DAY, DecToHex(days % 32))
         }
@@ -432,16 +433,17 @@ namespace SmartModule {
          * set hour
          * @param dat is the Hour will be set, eg: 0
          */
-        //% blockId=DS1302_set_hour block="%ds|set hour %dat set minute %minu set second %sec" group="DS1302时钟模块"
+        //% blockId=DS1302_set_hour block="DS1302时钟模块设置时 %hour set 分 %minu 秒 %sec" group="DS1302时钟模块"
         //% weight=73 blockGap=8
-        //% dat.min=0 dat.max=23
+        //% hour.min=0 dat.max=23
         //% minu.min=0 minu.max=59
         //% sec.min=0 sec.max=59
-        export function setHour(dat: number, minu: number, sec: number): void {
-            th = dat;
+        //% subcategory="智能模块"
+        export function setHour(hour: number, minu: number, sec: number): void {
+            th = hour;
             tm = minu;
             ts = sec;
-            wr(DS1302_REG_HOUR, DecToHex(dat % 24));
+            wr(DS1302_REG_HOUR, DecToHex(hour % 24));
             wr(DS1302_REG_MINUTE, DecToHex(minu % 60));
             wr(DS1302_REG_SECOND, DecToHex(sec % 60));
         }
@@ -451,9 +453,9 @@ namespace SmartModule {
         /**
          * start DS1302CLOCK RTC (go on)
          */
-        //% blockId=DS1302_start block="%ds|start RTC" group="DS1302时钟模块"
+        //% blockId=DS1302_start block="DS1302时钟模块开始" group="DS1302时钟模块"
         //% weight=41 blockGap=8
-
+        //% subcategory="智能模块"
         export function ds1302Start() {
             btns = 1;
         }
@@ -461,8 +463,9 @@ namespace SmartModule {
         /**
          * pause DS1302CLOCK RTC
          */
-        //% blockId=DS1302_pause block="%ds|pause RTC" group="DS1302时钟模块"
+        //% blockId=DS1302_pause block="DS1302时钟模块暂停" group="DS1302时钟模块"
         //% weight=40 blockGap=8
+        //% subcategory="智能模块"
         export function pause() {
             btns = 0;
         }
@@ -476,7 +479,8 @@ namespace SmartModule {
      * @param cs the CS pin for DS1302CLOCK, eg: DigitalPin.P15
      */
     //% weight=200 blockGap=8
-    //% blockId=DS1302_create block="CLK %clk|DIO %dio|CS %cs" group="DS1302时钟模块"
+    //% blockId=DS1302_create block="初始化DS1302时钟模块 引脚CLK %clk|DIO %dio|CS %cs" group="DS1302时钟模块"
+    //% subcategory="智能模块"
     export function create(clk: DigitalPin, dio: DigitalPin, cs: DigitalPin): void {
         // let ds = new DS1302RTC();
         ds1302CLK = clk;
