@@ -123,6 +123,11 @@ namespace SmartModule {
         pins.i2cWriteBuffer(addr, buf)
     }
 
+    function i2cread(addr: number, reg: number) {
+        pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8BE);
+        let val = pins.i2cReadNumber(addr, NumberFormat.UInt8BE);
+        return val;
+    }
     
     function i2cwrite(addr: number, reg: number, value: number) {
         let buf = pins.createBuffer(2)
@@ -170,7 +175,6 @@ namespace SmartModule {
         i2cwriteContent(VOICE_IIC_ADDR, VOICE_ADD_WORDS_REG, word_number,word_content)
         basic.pause(300)
     }
-
 
     //% blockId="Speech_recognition_get_result" block="Speech recognition to get the corresponding number of the recognized words"   group="语音识别模块"
     //% subcategory="智能模块"
