@@ -275,34 +275,38 @@ namespace SmartModule {
         return Math.idiv(dat, 10) * 16 + (dat % 10)
     }
 
+    let ds1302CLK: DigitalPin;
+    let ds1302DIO: DigitalPin;
+    let ds1302CS: DigitalPin;
+
     /**
      * DS1302CLOCK RTC class
      */
-    export class DS1302RTC {
-        clk: DigitalPin;
-        dio: DigitalPin;
-        cs: DigitalPin;
+    // export class DS1302RTC {
+    //     clk: DigitalPin;
+    //     dio: DigitalPin;
+    //     cs: DigitalPin;
 
         /**
          * write a byte to DS1302CLOCK
          */
-        write_byte(dat: number) {
+        function write_byte(dat: number) {
             for (let i = 0; i < 8; i++) {
-                pins.digitalWritePin(this.dio, (dat >> i) & 1);
-                pins.digitalWritePin(this.clk, 1);
-                pins.digitalWritePin(this.clk, 0);
+                pins.digitalWritePin(ds1302DIO, (dat >> i) & 1);
+                pins.digitalWritePin(ds1302CLK, 1);
+                pins.digitalWritePin(ds1302CS, 0);
             }
         }
 
         /**
          * read a byte from DS1302CLOCK
          */
-        read_byte(): number {
+         function read_byte(): number {
             let d = 0;
             for (let i = 0; i < 8; i++) {
-                d = d | (pins.digitalReadPin(this.dio) << i);
-                pins.digitalWritePin(this.clk, 1);
-                pins.digitalWritePin(this.clk, 0);
+                d = d | (pins.digitalReadPin(ds1302DIO) << i);
+                pins.digitalWritePin(ds1302CLK, 1);
+                pins.digitalWritePin(ds1302CLK, 0);
             }
             return d;
         }
@@ -310,47 +314,47 @@ namespace SmartModule {
         /**
          * read reg
          */
-        getReg(reg: number): number {
+        function getReg(reg: number): number {
             let t = 0;
-            pins.digitalWritePin(this.cs, 1);
-            this.write_byte(reg);
-            t = this.read_byte();
-            pins.digitalWritePin(this.cs, 0);
+            pins.digitalWritePin(ds1302CS, 1);
+            write_byte(reg);
+            t = read_byte();
+            pins.digitalWritePin(ds1302CS, 0);
             return t;
         }
 
         /**
          * write reg
          */
-        setReg(reg: number, dat: number) {
-            pins.digitalWritePin(this.cs, 1);
-            this.write_byte(reg);
-            this.write_byte(dat);
-            pins.digitalWritePin(this.cs, 0);
+         function setReg(reg: number, dat: number) {
+            pins.digitalWritePin(ds1302CS, 1);
+            write_byte(reg);
+            write_byte(dat);
+            pins.digitalWritePin(ds1302CS, 0);
         }
 
         /**
          * write reg with WP protect
          */
-        wr(reg: number, dat: number) {
-            this.setReg(DS1302_REG_WP, 0)
-            this.setReg(reg, dat)
-            this.setReg(DS1302_REG_WP, 0)
+        function wr(reg: number, dat: number) {
+            setReg(DS1302_REG_WP, 0)
+            setReg(reg, dat)
+            setReg(DS1302_REG_WP, 0)
         }
 
 
         /**
          * get Year
          */
-        //% blockId=DS1302_get_year block="%ds|get time %TIME" group="DS1602时钟模块"
+        //% blockId=DS1302_get_year block="%ds|get time %TIME" group="DS1302时钟模块"
         //% weight=80 blockGap=8
-        //% parts="DS1302CLOCK"
-        getYear(TIME: times): number {
+      
+        export function getYear(TIME: times): number {
             if (btns == 1) {
-                ts = Math.min(HexToDec(this.getReg(DS1302_REG_SECOND + 1)), 59)
-                this.wr(DS1302_REG_SECOND, DecToHex(ts & 0x7f % 60));
-                this.setYear(tys, tms, tds);
-                this.setHour(th, tm, ts);
+                ts = Math.min(HexToDec(getReg(DS1302_REG_SECOND + 1)), 59)
+                wr(DS1302_REG_SECOND, DecToHex(ts & 0x7f % 60));
+                setYear(tys, tms, tds);
+                setHour(th, tm, ts);
                 switch (TIME) {
                     case 0:
                         looks = tys;
@@ -380,23 +384,23 @@ namespace SmartModule {
             } else {
                 switch (TIME) {
                     case 0:
-                        this.setYear(looks, tms, tds)
+                        setYear(looks, tms, tds)
                     // return Math.min(HexToDec(this.getReg(DS1302_REG_YEAR + 1)), 99) + 2000;
                     case 1:
-                        this.setYear(tys, looks, tds)
+                        setYear(tys, looks, tds)
                     // return Math.max(Math.min(HexToDec(this.getReg(DS1302_REG_MONTH + 1)), 12), 1);
                     case 2:
-                        this.setYear(tys, tms, looks)
+                        setYear(tys, tms, looks)
                     // return Math.max(Math.min(HexToDec(this.getReg(DS1302_REG_DAY + 1)), 31), 1);
                     case 3:
-                        this.setHour(looks, tm, ts)
+                        setHour(looks, tm, ts)
                     // return Math.min(HexToDec(this.getReg(DS1302_REG_HOUR + 1)), 23);
                     case 4:
-                        this.setHour(th, looks, ts)
+                        setHour(th, looks, ts)
                     // return Math.min(HexToDec(this.getReg(DS1302_REG_MINUTE + 1)), 59);
                     default:
                         // return Math.min(HexToDec(this.getReg(DS1302_REG_SECOND + 1)), 59);
-                        this.setHour(th, tm, looks)
+                        setHour(th, tm, looks)
                 }
                 return looks;
             }
@@ -411,37 +415,35 @@ namespace SmartModule {
          * set year
          * @param dat is the Year will be set, eg: 2018
          */
-        //% blockId=DS1302_set_year block="%ds|set year %dat set month %mon set day %days" group="DS1602时钟模块"
+        //% blockId=DS1302_set_year block="%ds|set year %dat set month %mon set day %days" group="DS1302时钟模块"
         //% weight=81 blockGap=8
-        //% parts="DS1302CLOCK"
         //% mon.min=1 mon.max=12
         //% days.min=1 days.max=31
-        setYear(dat: number, mon: number, days: number): void {
+        export function setYear(dat: number, mon: number, days: number): void {
             tys = dat;
             tms = mon;
             tds = days;
-            this.wr(DS1302_REG_YEAR, DecToHex(dat % 100));
-            this.wr(DS1302_REG_MONTH, DecToHex(mon % 13));
-            this.wr(DS1302_REG_DAY, DecToHex(days % 32))
+            wr(DS1302_REG_YEAR, DecToHex(dat % 100));
+            wr(DS1302_REG_MONTH, DecToHex(mon % 13));
+            wr(DS1302_REG_DAY, DecToHex(days % 32))
         }
 
         /**
          * set hour
          * @param dat is the Hour will be set, eg: 0
          */
-        //% blockId=DS1302_set_hour block="%ds|set hour %dat set minute %minu set second %sec" group="DS1602时钟模块"
+        //% blockId=DS1302_set_hour block="%ds|set hour %dat set minute %minu set second %sec" group="DS1302时钟模块"
         //% weight=73 blockGap=8
-        //% parts="DS1302CLOCK"
         //% dat.min=0 dat.max=23
         //% minu.min=0 minu.max=59
         //% sec.min=0 sec.max=59
-        setHour(dat: number, minu: number, sec: number): void {
+        export function setHour(dat: number, minu: number, sec: number): void {
             th = dat;
             tm = minu;
             ts = sec;
-            this.wr(DS1302_REG_HOUR, DecToHex(dat % 24));
-            this.wr(DS1302_REG_MINUTE, DecToHex(minu % 60));
-            this.wr(DS1302_REG_SECOND, DecToHex(sec % 60));
+            wr(DS1302_REG_HOUR, DecToHex(dat % 24));
+            wr(DS1302_REG_MINUTE, DecToHex(minu % 60));
+            wr(DS1302_REG_SECOND, DecToHex(sec % 60));
         }
 
 
@@ -449,24 +451,23 @@ namespace SmartModule {
         /**
          * start DS1302CLOCK RTC (go on)
          */
-        //% blockId=DS1302_start block="%ds|start RTC" group="DS1602时钟模块"
+        //% blockId=DS1302_start block="%ds|start RTC" group="DS1302时钟模块"
         //% weight=41 blockGap=8
-        //% parts="DS1302CLOCK"
-        start() {
+
+        export function ds1302Start() {
             btns = 1;
         }
 
         /**
          * pause DS1302CLOCK RTC
          */
-        //% blockId=DS1302_pause block="%ds|pause RTC" group="DS1602时钟模块"
+        //% blockId=DS1302_pause block="%ds|pause RTC" group="DS1302时钟模块"
         //% weight=40 blockGap=8
-        //% parts="DS1302CLOCK"
-        pause() {
+        export function pause() {
             btns = 0;
         }
 
-    }
+    // }
 
     /**
      * create a DS1302CLOCK object.
@@ -475,15 +476,15 @@ namespace SmartModule {
      * @param cs the CS pin for DS1302CLOCK, eg: DigitalPin.P15
      */
     //% weight=200 blockGap=8
-    //% blockId=DS1302_create block="CLK %clk|DIO %dio|CS %cs" group="DS1602时钟模块"
-    export function create(clk: DigitalPin, dio: DigitalPin, cs: DigitalPin): DS1302RTC {
-        let ds = new DS1302RTC();
-        ds.clk = clk;
-        ds.dio = dio;
-        ds.cs = cs;
-        pins.digitalWritePin(ds.clk, 0);
-        pins.digitalWritePin(ds.cs, 0);
-        return ds;
+    //% blockId=DS1302_create block="CLK %clk|DIO %dio|CS %cs" group="DS1302时钟模块"
+    export function create(clk: DigitalPin, dio: DigitalPin, cs: DigitalPin): void {
+        // let ds = new DS1302RTC();
+        ds1302CLK = clk;
+        ds1302DIO = dio;
+        ds1302CS = cs;
+        pins.digitalWritePin(ds1302CLK, 0);
+        pins.digitalWritePin(ds1302CS, 0);
+        // return ds;
     }
 
 
