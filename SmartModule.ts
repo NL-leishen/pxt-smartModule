@@ -87,9 +87,9 @@ enum Mode {
     //% block="BUTTON"
     BUTTON_MODE = 1,      // 按键模式
     //% block="KEYWORDS"
-    KEYWORDS_MODE = 2,    // 关键字模式
+    KEYWORDS_MODE = 2,    // 唤醒词模式
     //% block="KEYWORDS_AND"
-    KEYWORDS_AND_BUTTON = 3, //关键字加按键模式
+    KEYWORDS_AND_BUTTON = 3, // 唤醒词加按键模式
 }
 
 enum times {
@@ -117,84 +117,108 @@ namespace SmartModule {
     let VOICE_RESULT_REG = 0;
     let VOICE_CONFIG_TIME_REG = 0x3;
 
-    function i2cwrite(addr: number, reg: number, value: number) {
-        let buf = pins.createBuffer(2)
-        buf[0] = reg
-        buf[1] = value
-        pins.i2cWriteBuffer(addr, buf)
-    }
-
-    function i2cwrite1(addr: number, reg: number, value: number ,value1: string) {
-        let lengths = value1.length
-        let buf = pins.createBuffer(2+lengths)
-        //let arr = value1.split('')
-        buf[0] = reg 
-        buf[1] = value
-        let betys = []
-        betys = stringToBytes(value1)
-        for (let i = 0; i < betys.length; i++) {
-            buf[2+i] = betys[i]
-        }
-        pins.i2cWriteBuffer(addr, buf)
-    }
-    
     function i2ccmd(addr: number, value: number) {
         let buf = pins.createBuffer(1)
         buf[0] = value
         pins.i2cWriteBuffer(addr, buf)
     }
 
-    function i2cread(addr: number, reg: number) {
-        pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8BE);
-        let val = pins.i2cReadNumber(addr, NumberFormat.UInt8BE);
-        return val;
+    
+    function i2cwrite(addr: number, reg: number, value: number) {
+        let buf = pins.createBuffer(2)
+        buf[0] = reg
+        buf[1] = value
+        pins.i2cWriteBuffer(addr, buf)
     }
-
-    //% blockId=Speech_recognition_reset block="Voice recognition module for reset"  group="语音识别模块"
+    //% blockId="Speech_recognition_reset" block="Voice recognition module for reset"  group="语音识别模块"
+    //% subcategory="智能模块"
     //% inlineInputMode=inline
-    export function Speech_recognition_reset(): void {
+     //% weight=100
+     export function Speech_recognition_reset(): void {
         i2ccmd(VOICE_IIC_ADDR,VOICE_RESET_REG)
         basic.pause(300)
     }
-
-    //% blockId=Speech_recognition_mode block="The voice recognition mode is set to %Mode"  group="语音识别模块"
+    
+    //% blockId="Speech_recognition_start" block="Voice recognition starts to recognize"  group="语音识别模块"
+    //% subcategory="智能模块"
     //% inlineInputMode=inline
-    export function Speech_recognition_mode(Mode : Mode): void {
-        i2cwrite(VOICE_IIC_ADDR,VOICE_RESET_REG,Mode)
-        basic.pause(300)
-    }
-
-    //% blockId=Speech_recognition_glossary block="Voice recognition to set the word number %word_number|Word content %word_content"  group="语音识别模块"
-    //% inlineInputMode=inline
-    export function Speech_recognition_glossary(word_number : number, word_content : string): void {
-        i2cwrite1(VOICE_IIC_ADDR, VOICE_ADD_WORDS_REG, word_number,word_content)
-        basic.pause(300)
-    }
-
-    //% blockId=Speech_recognition_start block="Voice recognition starts to recognize"  group="语音识别模块"
-    //% inlineInputMode=inline
+    //% weight=99
     export function Speech_recognition_start(): void {
         i2ccmd(VOICE_IIC_ADDR,VOICE_ASR_START_REG)
         basic.pause(300)
     }
 
-    //% blockId=Speech_recognition_get_result block="Speech recognition to get the corresponding number of the recognized words"   group="语音识别模块"
+    //% blockId="Speech_recognition_mode" block="The voice recognition mode is set to %Mode"  group="语音识别模块"
+    //% subcategory="智能模块"
     //% inlineInputMode=inline
-    export function Speech_recognition_get_result(): number {
-       let result =i2cread(VOICE_IIC_ADDR,VOICE_RESULT_REG)
-       return result;
+    //% weight=98
+    export function Speech_recognition_mode(Mode : Mode): void {
+        i2cwrite(VOICE_IIC_ADDR,VOICE_RESET_REG,Mode)
+        basic.pause(300)
     }
 
-    //% blockId=Speech_recognition_time block="Voice recognition to set wake-up time %time"  group="语音识别模块"
+    /**
+     * speed recognition glossary. 
+     * @param word_number is the word number,eg: 1
+     * 
+    */
+    //% blockId="Speech_recognition_glossary" block="Voice recognition to set the word number %word_number|Word content %word_content"  group="语音识别模块"
+    //% subcategory="智能模块"
     //% inlineInputMode=inline
+    //% weight=95
+    export function Speech_recognition_glossary(word_number : number, word_content : string): void {
+        i2cwriteContent(VOICE_IIC_ADDR, VOICE_ADD_WORDS_REG, word_number,word_content)
+        basic.pause(300)
+    }
+
+
+    //% blockId="Speech_recognition_get_result" block="Speech recognition to get the corresponding number of the recognized words"   group="语音识别模块"
+    //% subcategory="智能模块"
+    //% inlineInputMode=inline
+    //% weight=96
+    export function Speech_recognition_get_result(): number {
+        let result =i2cread(VOICE_IIC_ADDR,VOICE_RESULT_REG)
+        return result;
+     }
+
+    //% blockId="Speech_config_keyword" block="Voice recognition module set wake-up keywords %word_content"  group="语音识别模块"
+    //% subcategory="智能模块"
+    //% inlineInputMode=inline
+    //% weight=95
+    export function Speech_config_keyword(word_content : string): void {
+        i2cwriteContent(VOICE_IIC_ADDR, VOICE_ADD_WORDS_REG, 0, word_content)
+        basic.pause(300)
+    }
+    
+    /**
+     * speed recognition time. 
+     * @param time is the key word config time,eg: 10
+     * 
+    */
+    //% blockId="Speech_recognition_time" block="Voice recognition to set wake-up time %time"  group="语音识别模块"
+    //% subcategory="智能模块"
+    //% inlineInputMode=inline
+    //% weight=97
     export function Speech_recognition_time(time : number): void {
         i2cwrite(VOICE_IIC_ADDR,VOICE_CONFIG_TIME_REG,time)
         basic.pause(300)
     }
 
-    function stringToBytes (str : string) {  
+    function i2cwriteContent(addr: number, reg: number, value: number ,value1: string) {
+        let lengths = value1.length
+        let buf = pins.createBuffer(2+lengths)
+        //let arr = value1.split('')
+        buf[0] = reg 
+        buf[1] = value
+        let bytes = []
+        bytes = stringToBytes(value1)
+        for (let i = 0; i < bytes.length; i++) {
+            buf[2+i] = bytes[i]
+        }
+        pins.i2cWriteBuffer(addr, buf)
+    }
 
-        
+    function stringToBytes (str : string) {  
         let ch = 0;
         let st = 0;
         let gm:number[]; 
@@ -202,18 +226,16 @@ namespace SmartModule {
         for (let i = 0; i < str.length; i++ ) { 
             ch = str.charCodeAt(i);  
             st = 0 ;                 
-
            do {  
                 st = ( ch & 0xFF );  
                 ch = ch >> 8;   
                 gm.push(st);        
             }    
-
             while ( ch );  
-            
         }  
         return gm;  
     } 
+
 
 
     let DS1302_REG_SECOND = 0x80

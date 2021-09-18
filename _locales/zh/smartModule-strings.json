@@ -1,12 +1,17 @@
 {
     "SmartModule|block": "Smart module",
-    "SmartModule.Speech_recognition_reset|block": "语音识别模块进行复位",
-    "SmartModule.Speech_recognition_mode|block": "语音识别模式设置为 %Mode",
-    "SmartModule.Speech_recognition_glossary|block": "语音识别设置词条编号 %word_number|词条内容 %word_content",
-    "SmartModule.Speech_recognition_start|block": "语音识别开始识别",
-    "SmartModule.Speech_recognition_get_result|block": "语音识别获取识别到的词条编号",
-    "SmartModule.Speech_recognition_time|block": "语音识别设置唤醒时间 %time",
     "SmartModule.gesture_listener_block|block": "检测手势|%gesture",
     "SmartModule.gesture_init|block": "初始化手势传感器",
-    "SmartModule.getSensorData|block": "获取颜色数值 %colorId"
+    "SmartModule.getSensorData|block": "获取颜色数值 %colorId",
+    "SmartModule.Speech_recognition_reset|block": "语音识别模块初始化",
+    "Mode.LOOP_MODE|block": "循环模式",
+    "Mode.BUTTON_MODE|block": "按键模式",
+    "Mode.KEYWORDS_MODE|block": "口令模式",
+    "Mode.KEYWORDS_AND_BUTTON|block": "口令按键模式",
+    "SmartModule.Speech_recognition_mode|block": "语音识别模块模式设置为%Mode",
+    "SmartModule.Speech_recognition_glossary|block": "语音识别模块设置词条编号%word_number 词条内容%word_content",
+    "SmartModule.Speech_recognition_start|block": "语音识别模块开始识别",
+    "SmartModule.Speech_recognition_get_result|block": "语音识别模块获取识别到的词条的对应编号",
+    "SmartModule.Speech_recognition_time|block": "语音识别模块设置唤醒等待时间%time秒(S)",
+    "SmartModule.Speech_config_keyword|block": "语音识别模块设置口令关键词 %word_content"
 }
