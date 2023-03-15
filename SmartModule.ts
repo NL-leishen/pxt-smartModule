@@ -107,7 +107,7 @@ enum times {
     time6 = 5,
 }
 
-//% weight=20 color=#0855AA icon="O" block="Smart module"
+//% weight=20 color=#0855AA icon="O" block="SmartModule"
 namespace SmartModule {
 
     let VOICE_RESET_REG = 0x5;
@@ -278,15 +278,6 @@ namespace SmartModule {
     let ds1302CLK: DigitalPin;
     let ds1302DIO: DigitalPin;
     let ds1302CS: DigitalPin;
-
-    /**
-     * DS1302CLOCK RTC class
-     */
-    // export class DS1302RTC {
-    //     clk: DigitalPin;
-    //     dio: DigitalPin;
-    //     cs: DigitalPin;
-
         /**
          * write a byte to DS1302CLOCK
          */
